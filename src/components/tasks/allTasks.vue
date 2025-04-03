@@ -1,14 +1,22 @@
 <template>
 
-  <div class="allTasks">
-    <div class="task-column" v-for="(tasksInGroup, index) in groupedTasks" :key="index">
-      <h3 class="column-title">{{ index }}</h3>
-      <SingleTask
-          v-for="task in tasksInGroup" :key="task.id" :task="task"
-          @delete-task="emit('delete-task', $event)"
-          @show-popup="openPopup"
-      ></SingleTask>
+  <div class="mainDiv">
+
+    <div class="header">
+      <button class="create-btn" @click="emit('show-create-popup')">Create task</button>
     </div>
+
+    <div class="allTasks">
+      <div class="task-column" v-for="(tasksInGroup, index) in groupedTasks" :key="index">
+        <h3 class="column-title">{{ index }}</h3>
+        <SingleTask
+            v-for="task in tasksInGroup" :key="task.id" :task="task"
+            @delete-task="emit('delete-task', $event)"
+            @show-popup="openPopup"
+        ></SingleTask>
+      </div>
+    </div>
+
   </div>
 
   <PopupTask
@@ -40,7 +48,10 @@ import {defineEmits, defineProps, ref} from 'vue';
     groupedTasks: Record<BoardType, TaskType[]>
   }>();
 
-  const emit = defineEmits<{(e: 'delete-task', id: string): void;}>();
+  const emit = defineEmits<{
+    (e: 'delete-task', id: string): void;
+    (e: 'show-create-popup'): void;
+  }>();
 
   function closePopup() {
     showPopup.value = false;
@@ -57,12 +68,31 @@ import {defineEmits, defineProps, ref} from 'vue';
   margin-bottom: 1rem;
 }
 
+.create-btn {
+  background-color: #315194;
+  border: none;
+  color: white;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.mainDiv {
+  background: #f4f5f7;
+}
+
+.header {
+  display: flex;
+  margin-left: 15px;
+}
+
 .allTasks {
   display: flex;
   gap: 1rem;
   padding: 1rem;
   overflow-x: auto;
-  background: #f4f5f7;
 }
 
 .task-column {

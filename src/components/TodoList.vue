@@ -1,13 +1,21 @@
 <template>
 
-  <CreateTask @add-task="addTask"></CreateTask>
+  <CreateTask
+      @add-task="addTask"
+      @close-create-task="closeCreateTaskPopup"
+      v-if="showCreatePopup"
+  ></CreateTask>
   <SortTask
     :prioritySort="prioritySort"
     @update:priority-sort="prioritySort = $event"
     @change-sort="changeSort"
   ></SortTask>
 
-  <AllTasks :groupedTasks="groupedTasks" @delete-task="deleteTask"></AllTasks>
+  <AllTasks
+      :groupedTasks="groupedTasks"
+      @delete-task="deleteTask"
+      @showCreatePopup="openCreatePopup"
+  ></AllTasks>
 
 </template>
 
@@ -16,7 +24,6 @@
 
 
 import { defineComponent } from "vue";
-import {Form, Field, ErrorMessage} from "vee-validate";
 import {generateRandomId, getAllTasks, updateAllTasks } from "@/models/tasksModel";
 import TaskType from "@/Types/TaskType";
 import {priorityOrder} from "@/Types/PriorityOrder";
@@ -25,6 +32,7 @@ import { BoardType } from "@/Types/boards/BoardType";
 import CreateTask from "@/components/tasks/createTask.vue";
 import SortTask from "@/components/tasks/sortTask.vue";
 import AllTasks from "@/components/tasks/allTasks.vue";
+import {prepareTask, sortTasks } from "@/services/taskService";
 
 export default defineComponent({
     name: "TodoList",
@@ -38,6 +46,7 @@ export default defineComponent({
         id: '',
         tasks: [] as TaskType[],
         prioritySort: '',
+        showCreatePopup: false,
       }
     },
 
@@ -74,16 +83,16 @@ export default defineComponent({
 
     methods: {
 
+      openCreatePopup() {
+        this.showCreatePopup = true;
+      },
+
+      closeCreateTaskPopup() {
+          this.showCreatePopup = false;
+      },
+
       changeSort() {
-
-        const direction = this.prioritySort == 'important' ? 1 : -1;
-
-        this.tasks.sort((a, b) => {
-          const aPriority = priorityOrder[a.priority ?? 'nebitan'];
-          const bPriority = priorityOrder[b.priority ?? 'nebitan'];
-          return (aPriority - bPriority) * direction;
-        });
-
+        this.tasks = sortTasks(this.tasks, this.prioritySort);
       },
 
       addTask(newTask: TaskType) {
@@ -95,22 +104,9 @@ export default defineComponent({
           return;
         }
 
-        let tempId = generateRandomId();
+        const preparedTask = prepareTask(newTask, this.tasks);
 
-        if(isIdUsed(tempId, this.tasks)) {
-          tempId = generateRandomId();
-        }
-
-        const task = {
-          id: generateRandomId(),
-          title: newTask.title,
-          description: newTask.description,
-          dueDate: newTask.dueDate,
-          priority: newTask.priority,
-          board: newTask.board,
-        };
-
-        this.tasks.push(task);
+        this.tasks.push(preparedTask);
 
       },
 
