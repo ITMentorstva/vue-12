@@ -4,7 +4,7 @@ import App from './App.vue'
 
 import { defineRule } from "vee-validate";
 import { required, min, max } from "@vee-validate/rules";
-import {parse} from "@typescript-eslint/parser";
+import { createPinia } from "pinia";
 
 defineRule('required', required);
 defineRule('min', min);
@@ -40,5 +40,6 @@ defineRule('minWords', (value: string, [minWords]: [number]) => {
     return true;
 });
 
-
-createApp(App).mount('#app')
+const realApp = createApp(App);
+realApp.use(createPinia());
+realApp.mount('#app');

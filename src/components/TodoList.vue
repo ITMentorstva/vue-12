@@ -12,8 +12,7 @@
   ></SortTask>
 
   <AllTasks
-      :groupedTasks="groupedTasks"
-      @delete-task="deleteTask"
+      :groupedTasks="taskStore.groupedTasks"
       @showCreatePopup="openCreatePopup"
   ></AllTasks>
 
@@ -26,13 +25,12 @@
 import { defineComponent } from "vue";
 import {generateRandomId, getAllTasks, updateAllTasks } from "@/models/tasksModel";
 import TaskType from "@/Types/TaskType";
-import {priorityOrder} from "@/Types/PriorityOrder";
-import { isIdUsed } from "@/helpers/idHelper";
 import { BoardType } from "@/Types/boards/BoardType";
 import CreateTask from "@/components/tasks/createTask.vue";
 import SortTask from "@/components/tasks/sortTask.vue";
 import AllTasks from "@/components/tasks/allTasks.vue";
 import {prepareTask, sortTasks } from "@/services/taskService";
+import { useTaskStore } from "@/stores/useTaskStore";
 
 export default defineComponent({
     name: "TodoList",
@@ -41,6 +39,14 @@ export default defineComponent({
       SortTask,
       CreateTask,
     },
+
+    setup() {
+      const taskStore = useTaskStore();
+      return {
+        taskStore
+      };
+    },
+
     data() {
       return {
         id: '',
@@ -108,10 +114,6 @@ export default defineComponent({
 
         this.tasks.push(preparedTask);
 
-      },
-
-      deleteTask(id: string) {
-        this.tasks = this.tasks.filter(task => task.id !== id);
       }
     }
   });

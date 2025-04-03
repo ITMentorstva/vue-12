@@ -5,7 +5,7 @@
     <p><strong>Deadline:</strong> {{ task.dueDate }}</p>
     <p><strong>Priority:</strong> {{ task.priority }}</p>
     <button class="delete-btn btn-blue" @click="handleShowPopup">Show task</button>
-    <button class="delete-btn" @click="handleDelete">Delete task</button>
+    <button class="delete-btn" @click="taskStore.deleteTask(task.id)">Delete task</button>
   </div>
 </template>
 
@@ -13,19 +13,18 @@
 
   import { defineProps, defineEmits } from 'vue';
   import TaskType from "@/Types/TaskType";
+  import {useTaskStore} from "@/stores/useTaskStore";
+
+  const taskStore = useTaskStore();
 
   const props = defineProps<{
     task: TaskType
   }>();
 
   const emit = defineEmits<{
-    (e: 'delete-task', id: string): void;
     (e: 'show-popup', task: TaskType): void;
   }>();
 
-  function handleDelete() {
-    emit('delete-task', props.task.id);
-  }
 
   function handleShowPopup() {
     emit('show-popup', props.task);

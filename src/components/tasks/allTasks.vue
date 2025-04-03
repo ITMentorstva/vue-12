@@ -11,7 +11,6 @@
         <h3 class="column-title">{{ index }}</h3>
         <SingleTask
             v-for="task in tasksInGroup" :key="task.id" :task="task"
-            @delete-task="emit('delete-task', $event)"
             @show-popup="openPopup"
         ></SingleTask>
       </div>
@@ -49,7 +48,6 @@ import {defineEmits, defineProps, ref} from 'vue';
   }>();
 
   const emit = defineEmits<{
-    (e: 'delete-task', id: string): void;
     (e: 'show-create-popup'): void;
   }>();
 
